@@ -3,244 +3,1268 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Minh — Financial Dashboard</title>
+  <meta name="theme-color" content="#0a0e17" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <title>M.A.R.K. — Financial Intelligence</title>
   <script src="data.js"></script>
   <style>
+    @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Rajdhani:wght@300;400;500;600;700&family=Share+Tech+Mono&display=swap');
+
     :root {
-      --bg: #0b0f14;
-      --card: #131a24;
-      --card-2: #1a2230;
-      --text: #e7eef7;
-      --muted: #8a98ac;
-      --accent: #6aa9ff;
-      --green: #3ecf8e;
-      --red: #ff6b6b;
-      --border: #222c3b;
+      --bg: #0a0e17;
+      --bg-2: #0d1220;
+      --card: rgba(10, 18, 35, 0.85);
+      --card-hover: rgba(15, 25, 50, 0.95);
+      --text: #c8daf0;
+      --text-bright: #e8f0ff;
+      --muted: #4a6080;
+      --cyan: #00e5ff;
+      --cyan-dim: rgba(0, 229, 255, 0.15);
+      --cyan-glow: rgba(0, 229, 255, 0.4);
+      --blue: #2979ff;
+      --blue-dim: rgba(41, 121, 255, 0.15);
+      --orange: #ff6d00;
+      --orange-dim: rgba(255, 109, 0, 0.15);
+      --green: #00e676;
+      --green-dim: rgba(0, 230, 118, 0.15);
+      --red: #ff1744;
+      --red-dim: rgba(255, 23, 68, 0.15);
+      --yellow: #ffd600;
+      --yellow-dim: rgba(255, 214, 0, 0.15);
+      --border: rgba(0, 229, 255, 0.12);
+      --border-bright: rgba(0, 229, 255, 0.3);
+      --scanline: rgba(0, 229, 255, 0.03);
     }
-    * { box-sizing: border-box; }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
     body {
-      margin: 0;
       background: var(--bg);
       color: var(--text);
-      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Inter", system-ui, sans-serif;
-      font-size: 14px;
-      line-height: 1.55;
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 15px;
+      line-height: 1.5;
+      overflow-x: hidden;
+      min-height: 100vh;
     }
-    .container { max-width: 1200px; margin: 0 auto; padding: 32px 24px 80px; }
-    header { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 28px; border-bottom: 1px solid var(--border); padding-bottom: 20px; }
-    header h1 { font-size: 22px; margin: 0; letter-spacing: -0.01em; }
-    header .sub { color: var(--muted); font-size: 12px; margin-top: 4px; }
-    .generated { color: var(--muted); font-size: 11px; }
-    .grid { display: grid; gap: 16px; }
-    .grid-4 { grid-template-columns: repeat(4, 1fr); }
-    .grid-2 { grid-template-columns: 1.4fr 1fr; }
-    .grid-3 { grid-template-columns: repeat(3, 1fr); }
-    @media (max-width: 900px) {
-      .grid-4 { grid-template-columns: repeat(2, 1fr); }
-      .grid-2, .grid-3 { grid-template-columns: 1fr; }
+
+    /* Animated background grid */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background:
+        linear-gradient(rgba(0,229,255,0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0,229,255,0.03) 1px, transparent 1px);
+      background-size: 60px 60px;
+      animation: gridMove 20s linear infinite;
+      pointer-events: none;
+      z-index: 0;
     }
-    .card {
+
+    @keyframes gridMove {
+      0% { transform: translate(0, 0); }
+      100% { transform: translate(60px, 60px); }
+    }
+
+    /* Scanline overlay */
+    body::after {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background: repeating-linear-gradient(
+        0deg,
+        transparent,
+        transparent 2px,
+        var(--scanline) 2px,
+        var(--scanline) 4px
+      );
+      pointer-events: none;
+      z-index: 9999;
+    }
+
+    /* Vignette */
+    .vignette {
+      position: fixed;
+      inset: 0;
+      background: radial-gradient(ellipse at center, transparent 50%, rgba(0,0,0,0.6) 100%);
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 20px 16px 100px;
+      position: relative;
+      z-index: 2;
+    }
+
+    /* Header */
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 16px 0 20px;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 24px;
+      position: relative;
+    }
+
+    .header::after {
+      content: '';
+      position: absolute;
+      bottom: -1px;
+      left: 0;
+      width: 100%;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--cyan), transparent);
+      animation: headerPulse 3s ease-in-out infinite;
+    }
+
+    @keyframes headerPulse {
+      0%, 100% { opacity: 0.3; }
+      50% { opacity: 1; }
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .arc-reactor {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      border: 2px solid var(--cyan);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      animation: reactorSpin 8s linear infinite;
+      box-shadow: 0 0 15px var(--cyan-glow), inset 0 0 10px var(--cyan-dim);
+    }
+
+    .arc-reactor::before {
+      content: '';
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: radial-gradient(circle, var(--cyan) 0%, transparent 70%);
+      animation: reactorPulse 2s ease-in-out infinite;
+    }
+
+    .arc-reactor::after {
+      content: '';
+      position: absolute;
+      inset: 4px;
+      border-radius: 50%;
+      border: 1px solid var(--cyan-dim);
+      border-top-color: var(--cyan);
+      animation: reactorSpin 3s linear infinite reverse;
+    }
+
+    @keyframes reactorSpin { to { transform: rotate(360deg); } }
+    @keyframes reactorPulse {
+      0%, 100% { opacity: 0.6; transform: scale(0.8); }
+      50% { opacity: 1; transform: scale(1.1); }
+    }
+
+    .logo-text h1 {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--cyan);
+      letter-spacing: 3px;
+      text-shadow: 0 0 20px var(--cyan-glow);
+    }
+
+    .logo-text .subtitle {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 10px;
+      color: var(--muted);
+      letter-spacing: 2px;
+      text-transform: uppercase;
+    }
+
+    .header-right {
+      text-align: right;
+      font-family: 'Share Tech Mono', monospace;
+    }
+
+    .status-line {
+      font-size: 11px;
+      color: var(--green);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      justify-content: flex-end;
+    }
+
+    .status-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--green);
+      animation: statusBlink 2s ease-in-out infinite;
+      box-shadow: 0 0 6px var(--green);
+    }
+
+    @keyframes statusBlink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.3; }
+    }
+
+    .timestamp {
+      font-size: 10px;
+      color: var(--muted);
+      margin-top: 2px;
+    }
+
+    /* HUD Card */
+    .hud-card {
       background: var(--card);
       border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 18px 20px;
+      border-radius: 4px;
+      padding: 18px;
+      position: relative;
+      backdrop-filter: blur(10px);
+      transition: all 0.3s ease;
+      overflow: hidden;
     }
-    .card h2 { font-size: 12px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); margin: 0 0 10px; font-weight: 500; }
-    .big { font-size: 26px; font-weight: 600; letter-spacing: -0.02em; }
-    .small { color: var(--muted); font-size: 12px; }
-    .row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid var(--border); }
-    .row:last-child { border-bottom: none; }
-    .row .k { color: var(--muted); }
-    table { width: 100%; border-collapse: collapse; font-size: 13px; }
-    th { text-align: left; color: var(--muted); font-weight: 500; font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; padding: 10px 8px; border-bottom: 1px solid var(--border); }
-    td { padding: 10px 8px; border-bottom: 1px solid var(--border); }
-    tr:last-child td { border-bottom: none; }
-    .tag { display: inline-block; padding: 2px 8px; border-radius: 6px; font-size: 11px; background: var(--card-2); color: var(--muted); }
-    .tag.risk-low { background: rgba(62,207,142,0.12); color: var(--green); }
-    .tag.risk-medium { background: rgba(255,180,60,0.12); color: #ffb43c; }
-    .tag.risk-high { background: rgba(255,107,107,0.12); color: var(--red); }
-    .bar { background: var(--card-2); border-radius: 6px; height: 8px; overflow: hidden; margin-top: 8px; }
-    .bar-fill { background: linear-gradient(90deg, var(--accent), #9ec7ff); height: 100%; }
-    .checklist li { list-style: none; padding: 6px 0; display: flex; align-items: center; gap: 10px; }
-    .checklist ul { padding: 0; margin: 0; }
-    .box { width: 14px; height: 14px; border: 1px solid var(--border); border-radius: 4px; flex-shrink: 0; }
-    .box.done { background: var(--green); border-color: var(--green); }
-    .empty { color: var(--muted); font-style: italic; padding: 20px 0; text-align: center; }
-    .split { display: flex; gap: 6px; margin-top: 10px; }
-    .split .seg { height: 8px; border-radius: 4px; }
-    .seg.au { background: var(--accent); }
-    .seg.vn { background: #f58a42; }
-    .seg.us { background: var(--green); }
-    .legend { display: flex; gap: 14px; margin-top: 8px; font-size: 11px; color: var(--muted); }
-    .dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 5px; vertical-align: middle; }
-    .dot.au { background: var(--accent); }
-    .dot.vn { background: #f58a42; }
-    .dot.us { background: var(--green); }
-    section { margin-top: 24px; }
-    section h3 { font-size: 14px; margin: 0 0 12px; font-weight: 600; color: var(--text); }
+
+    .hud-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--cyan), transparent);
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+
+    .hud-card:hover {
+      border-color: var(--border-bright);
+      background: var(--card-hover);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 30px rgba(0, 229, 255, 0.08);
+    }
+
+    .hud-card:hover::before { opacity: 1; }
+
+    /* Corner brackets on cards */
+    .hud-card .corner { position: absolute; width: 12px; height: 12px; }
+    .hud-card .corner-tl { top: -1px; left: -1px; border-top: 2px solid var(--cyan); border-left: 2px solid var(--cyan); }
+    .hud-card .corner-tr { top: -1px; right: -1px; border-top: 2px solid var(--cyan); border-right: 2px solid var(--cyan); }
+    .hud-card .corner-bl { bottom: -1px; left: -1px; border-bottom: 2px solid var(--cyan); border-left: 2px solid var(--cyan); }
+    .hud-card .corner-br { bottom: -1px; right: -1px; border-bottom: 2px solid var(--cyan); border-right: 2px solid var(--cyan); }
+
+    .card-label {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 9px;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--cyan);
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .card-label::before {
+      content: '';
+      width: 3px;
+      height: 12px;
+      background: var(--cyan);
+      box-shadow: 0 0 6px var(--cyan-glow);
+    }
+
+    /* Metrics grid */
+    .metrics-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 14px;
+      margin-bottom: 20px;
+    }
+
+    .metric-value {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 24px;
+      font-weight: 700;
+      color: var(--text-bright);
+      text-shadow: 0 0 10px rgba(0, 229, 255, 0.2);
+    }
+
+    .metric-sub {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 11px;
+      color: var(--muted);
+      margin-top: 4px;
+    }
+
+    /* Emergency fund arc */
+    .arc-container {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-top: 8px;
+    }
+
+    .arc-gauge {
+      width: 60px;
+      height: 60px;
+      position: relative;
+    }
+
+    .arc-gauge svg {
+      width: 100%;
+      height: 100%;
+      transform: rotate(-90deg);
+    }
+
+    .arc-gauge .track {
+      fill: none;
+      stroke: var(--border);
+      stroke-width: 4;
+    }
+
+    .arc-gauge .fill {
+      fill: none;
+      stroke: var(--cyan);
+      stroke-width: 4;
+      stroke-linecap: round;
+      stroke-dasharray: 163;
+      stroke-dashoffset: 163;
+      filter: drop-shadow(0 0 4px var(--cyan-glow));
+      transition: stroke-dashoffset 2s ease-out;
+    }
+
+    .arc-gauge .pct {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Orbitron', sans-serif;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--cyan);
+    }
+
+    /* Section layout */
+    .section {
+      margin-bottom: 20px;
+    }
+
+    .section-title {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 12px;
+      letter-spacing: 4px;
+      color: var(--cyan);
+      margin-bottom: 14px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      text-transform: uppercase;
+    }
+
+    .section-title::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: linear-gradient(90deg, var(--border-bright), transparent);
+    }
+
+    .grid-2 { display: grid; grid-template-columns: 1.5fr 1fr; gap: 14px; }
+    .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+
+    /* Budget donut */
+    .donut-container {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 24px;
+      padding: 10px 0;
+    }
+
+    .donut-chart {
+      width: 140px;
+      height: 140px;
+      position: relative;
+    }
+
+    .donut-chart svg { width: 100%; height: 100%; transform: rotate(-90deg); }
+    .donut-chart .segment {
+      fill: none;
+      stroke-width: 18;
+      transition: stroke-dashoffset 1.5s ease-out, opacity 0.3s;
+      cursor: pointer;
+    }
+    .donut-chart .segment:hover { opacity: 0.8; filter: drop-shadow(0 0 8px currentColor); }
+
+    .donut-center {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .donut-center .amount {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--text-bright);
+    }
+
+    .donut-center .label {
+      font-size: 10px;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .donut-legend {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 13px;
+      cursor: pointer;
+      transition: all 0.2s;
+      padding: 4px 8px;
+      border-radius: 4px;
+    }
+
+    .legend-item:hover { background: rgba(255,255,255,0.05); }
+
+    .legend-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 2px;
+      flex-shrink: 0;
+    }
+
+    .legend-value {
+      font-family: 'Share Tech Mono', monospace;
+      color: var(--text-bright);
+      margin-left: auto;
+      padding-left: 16px;
+    }
+
+    /* Investment split bar */
+    .split-bar {
+      display: flex;
+      height: 6px;
+      border-radius: 3px;
+      overflow: hidden;
+      margin: 12px 0 8px;
+      gap: 2px;
+    }
+
+    .split-seg {
+      height: 100%;
+      border-radius: 3px;
+      transition: flex 1s ease-out;
+      position: relative;
+    }
+
+    .split-seg.au { background: linear-gradient(90deg, var(--cyan), var(--blue)); box-shadow: 0 0 8px var(--cyan-dim); }
+    .split-seg.vn { background: linear-gradient(90deg, var(--orange), #ff9100); box-shadow: 0 0 8px var(--orange-dim); }
+    .split-seg.us { background: linear-gradient(90deg, var(--green), #69f0ae); box-shadow: 0 0 8px var(--green-dim); }
+
+    .split-labels {
+      display: flex;
+      gap: 16px;
+      font-size: 11px;
+      font-family: 'Share Tech Mono', monospace;
+    }
+
+    .split-label { display: flex; align-items: center; gap: 6px; }
+    .split-label .dot { width: 8px; height: 8px; border-radius: 2px; }
+    .dot-au { background: var(--cyan); }
+    .dot-vn { background: var(--orange); }
+    .dot-us { background: var(--green); }
+
+    /* Watchlist table */
+    .hud-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+
+    .hud-table th {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 9px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--muted);
+      padding: 10px 10px;
+      text-align: left;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .hud-table td {
+      padding: 12px 10px;
+      border-bottom: 1px solid rgba(0, 229, 255, 0.05);
+      vertical-align: middle;
+    }
+
+    .hud-table tr {
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .hud-table tbody tr:hover {
+      background: rgba(0, 229, 255, 0.04);
+    }
+
+    .hud-table tbody tr:last-child td { border-bottom: none; }
+
+    .ticker {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--cyan);
+      letter-spacing: 1px;
+    }
+
+    .market-tag {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 10px;
+      padding: 2px 6px;
+      border-radius: 3px;
+      letter-spacing: 1px;
+    }
+
+    .market-asx { background: var(--cyan-dim); color: var(--cyan); }
+    .market-hose { background: var(--orange-dim); color: var(--orange); }
+
+    .rating-tag {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 9px;
+      font-weight: 600;
+      padding: 3px 8px;
+      border-radius: 3px;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+    }
+
+    .rating-buy { background: var(--green-dim); color: var(--green); border: 1px solid rgba(0,230,118,0.2); }
+    .rating-hold { background: var(--yellow-dim); color: var(--yellow); border: 1px solid rgba(255,214,0,0.2); }
+    .rating-wait { background: var(--orange-dim); color: var(--orange); border: 1px solid rgba(255,109,0,0.2); }
+    .rating-sell { background: var(--red-dim); color: var(--red); border: 1px solid rgba(255,23,68,0.2); }
+
+    .risk-tag {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 10px;
+      padding: 2px 6px;
+      border-radius: 3px;
+    }
+
+    .risk-low { background: var(--green-dim); color: var(--green); }
+    .risk-medium { background: var(--yellow-dim); color: var(--yellow); }
+    .risk-high { background: var(--red-dim); color: var(--red); }
+
+    .thesis-text {
+      font-size: 12px;
+      color: var(--muted);
+      max-width: 300px;
+    }
+
+    /* Expandable row detail */
+    .row-detail {
+      display: none;
+      padding: 14px 10px;
+      background: rgba(0, 229, 255, 0.02);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .row-detail.active { display: table-row; }
+
+    .detail-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+      padding: 4px 0;
+    }
+
+    .detail-item {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 11px;
+    }
+
+    .detail-label { color: var(--muted); }
+    .detail-value { color: var(--text-bright); }
+
+    /* FX ticker strip */
+    .fx-strip {
+      display: flex;
+      gap: 20px;
+      padding: 12px 0;
+      overflow: hidden;
+    }
+
+    .fx-pair {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 14px;
+      background: rgba(0, 229, 255, 0.04);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      flex: 1;
+      transition: all 0.3s;
+    }
+
+    .fx-pair:hover {
+      border-color: var(--cyan);
+      box-shadow: 0 0 12px var(--cyan-dim);
+    }
+
+    .fx-name {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 10px;
+      color: var(--muted);
+      letter-spacing: 1px;
+    }
+
+    .fx-rate {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 16px;
+      color: var(--text-bright);
+    }
+
+    /* Checklist */
+    .check-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 0;
+      border-bottom: 1px solid rgba(0, 229, 255, 0.05);
+      font-size: 13px;
+      transition: all 0.2s;
+    }
+
+    .check-item:last-child { border-bottom: none; }
+    .check-item:hover { padding-left: 4px; }
+
+    .check-box {
+      width: 18px;
+      height: 18px;
+      border: 1px solid var(--border);
+      border-radius: 3px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      transition: all 0.3s;
+    }
+
+    .check-box.done {
+      border-color: var(--green);
+      background: var(--green-dim);
+      box-shadow: 0 0 8px var(--green-dim);
+    }
+
+    .check-box.done::after {
+      content: '';
+      width: 8px;
+      height: 5px;
+      border-left: 2px solid var(--green);
+      border-bottom: 2px solid var(--green);
+      transform: rotate(-45deg) translateY(-1px);
+    }
+
+    .check-text.done { color: var(--muted); text-decoration: line-through; }
+
+    /* Research summary */
+    .research-banner {
+      background: linear-gradient(135deg, rgba(0, 229, 255, 0.06), rgba(41, 121, 255, 0.06));
+      border: 1px solid var(--border);
+      border-left: 3px solid var(--cyan);
+      border-radius: 4px;
+      padding: 16px 18px;
+      margin-top: 14px;
+    }
+
+    .research-date {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 10px;
+      color: var(--cyan);
+      letter-spacing: 2px;
+      margin-bottom: 6px;
+    }
+
+    .research-text {
+      font-size: 13px;
+      color: var(--text);
+      line-height: 1.6;
+    }
+
+    /* Portfolio empty state */
+    .empty-state {
+      text-align: center;
+      padding: 30px 20px;
+      color: var(--muted);
+    }
+
+    .empty-state .hex {
+      width: 50px;
+      height: 50px;
+      margin: 0 auto 14px;
+      position: relative;
+    }
+
+    .empty-state .hex::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border: 1px solid var(--border);
+      clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+      animation: hexPulse 3s ease-in-out infinite;
+    }
+
+    @keyframes hexPulse {
+      0%, 100% { border-color: var(--border); }
+      50% { border-color: var(--cyan); }
+    }
+
+    .empty-state p {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 12px;
+    }
+
+    /* Number animation */
+    .count-up {
+      display: inline-block;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .metrics-grid { grid-template-columns: repeat(2, 1fr); }
+      .grid-2, .grid-3 { grid-template-columns: 1fr; }
+      .header { flex-direction: column; align-items: flex-start; gap: 10px; }
+      .header-right { text-align: left; }
+      .metric-value { font-size: 20px; }
+      .logo-text h1 { font-size: 16px; }
+      .donut-container { flex-direction: column; }
+      .fx-strip { flex-direction: column; gap: 8px; }
+      .thesis-text { max-width: 160px; }
+      .hud-table { font-size: 12px; }
+      .detail-grid { grid-template-columns: 1fr; }
+      .container { padding: 12px 10px 80px; }
+    }
+
+    /* Loading animation */
+    .loading-overlay {
+      position: fixed;
+      inset: 0;
+      background: var(--bg);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 10000;
+      transition: opacity 0.8s, visibility 0.8s;
+    }
+
+    .loading-overlay.hidden { opacity: 0; visibility: hidden; }
+
+    .loading-ring {
+      width: 80px;
+      height: 80px;
+      border: 2px solid var(--border);
+      border-radius: 50%;
+      position: relative;
+      animation: reactorSpin 2s linear infinite;
+    }
+
+    .loading-ring::before {
+      content: '';
+      position: absolute;
+      inset: 8px;
+      border: 1px solid var(--cyan);
+      border-radius: 50%;
+      border-right-color: transparent;
+      animation: reactorSpin 1.5s linear infinite reverse;
+    }
+
+    .loading-ring::after {
+      content: '';
+      position: absolute;
+      inset: 20px;
+      border-radius: 50%;
+      background: radial-gradient(circle, var(--cyan) 0%, transparent 70%);
+      animation: reactorPulse 1.5s ease-in-out infinite;
+    }
+
+    .loading-text {
+      margin-top: 20px;
+      font-family: 'Orbitron', sans-serif;
+      font-size: 11px;
+      letter-spacing: 4px;
+      color: var(--cyan);
+      animation: textFlicker 1.5s ease-in-out infinite;
+    }
+
+    @keyframes textFlicker {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+
+    /* Tab system */
+    .tabs {
+      display: flex;
+      gap: 2px;
+      margin-bottom: 14px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .tab {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 10px;
+      letter-spacing: 2px;
+      color: var(--muted);
+      padding: 10px 16px;
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+      transition: all 0.3s;
+      text-transform: uppercase;
+      background: none;
+      border-top: none;
+      border-left: none;
+      border-right: none;
+    }
+
+    .tab:hover { color: var(--text); }
+    .tab.active {
+      color: var(--cyan);
+      border-bottom-color: var(--cyan);
+      text-shadow: 0 0 10px var(--cyan-glow);
+    }
+
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
+
+    /* Tooltip */
+    .tooltip-wrap {
+      position: relative;
+    }
+
+    .tooltip-wrap .tip {
+      display: none;
+      position: absolute;
+      bottom: 100%;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--bg-2);
+      border: 1px solid var(--cyan);
+      border-radius: 4px;
+      padding: 6px 10px;
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 11px;
+      color: var(--text-bright);
+      white-space: nowrap;
+      z-index: 100;
+      box-shadow: 0 0 12px var(--cyan-dim);
+      margin-bottom: 6px;
+    }
+
+    .tooltip-wrap:hover .tip { display: block; }
+
+    /* Footer */
+    .footer {
+      text-align: center;
+      padding: 30px 0;
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 10px;
+      color: var(--muted);
+      letter-spacing: 2px;
+    }
   </style>
 </head>
 <body>
-  <div class="container">
-    <header>
-      <div>
-        <h1>Financial Dashboard</h1>
-        <div class="sub">Personal advisor for <strong id="name"></strong> — AU / VN / US markets</div>
-      </div>
-      <div class="generated">Last updated: <span id="generated"></span></div>
-    </header>
 
-    <div class="grid grid-4">
-      <div class="card">
-        <h2>Net Worth</h2>
-        <div class="big" id="networth"></div>
-        <div class="small">Savings + investments</div>
+  <!-- Loading screen -->
+  <div class="loading-overlay" id="loader">
+    <div class="loading-ring"></div>
+    <div class="loading-text">INITIALIZING M.A.R.K.</div>
+  </div>
+
+  <div class="vignette"></div>
+
+  <div class="container">
+    <!-- Header -->
+    <div class="header">
+      <div class="logo">
+        <div class="arc-reactor"></div>
+        <div class="logo-text">
+          <h1>M.A.R.K.</h1>
+          <div class="subtitle">Market Analysis & Research Kit</div>
+        </div>
       </div>
-      <div class="card">
-        <h2>Monthly Income</h2>
-        <div class="big" id="income"></div>
-        <div class="small">Paid <span id="payday"></span> of each month</div>
-      </div>
-      <div class="card">
-        <h2>Risk Profile</h2>
-        <div class="big" id="risk"></div>
-        <div class="small" id="horizon"></div>
-      </div>
-      <div class="card">
-        <h2>Emergency Fund</h2>
-        <div class="big"><span id="savings"></span> / <span id="savings_target"></span></div>
-        <div class="bar"><div class="bar-fill" id="savings_bar"></div></div>
+      <div class="header-right">
+        <div class="status-line">
+          <div class="status-dot"></div>
+          <span>SYSTEM ONLINE</span>
+        </div>
+        <div class="timestamp" id="timestamp"></div>
       </div>
     </div>
 
-    <section>
-      <h3>This Month's Plan</h3>
-      <div class="grid grid-2">
-        <div class="card">
-          <h2 id="month_label"></h2>
-          <div class="row"><span class="k">Income</span><span id="m_income"></span></div>
-          <div class="row"><span class="k">Spending (rent + living)</span><span id="m_spending"></span></div>
-          <div class="row"><span class="k">Savings (emergency fund)</span><span id="m_savings"></span></div>
-          <div class="row"><span class="k">Investments</span><span id="m_invest"></span></div>
-        </div>
-        <div class="card">
-          <h2>Investment Split</h2>
-          <div class="row"><span class="k"><span class="dot au"></span>Australia</span><span id="inv_au"></span></div>
-          <div class="row"><span class="k"><span class="dot vn"></span>Vietnam</span><span id="inv_vn"></span></div>
-          <div class="row"><span class="k"><span class="dot us"></span>United States</span><span id="inv_us"></span></div>
-          <div class="split" id="split_bar"></div>
-          <div class="legend">
-            <span><span class="dot au"></span>AU</span>
-            <span><span class="dot vn"></span>VN</span>
-            <span><span class="dot us"></span>US</span>
+    <!-- Metrics -->
+    <div class="metrics-grid" id="metrics-grid"></div>
+
+    <!-- Tabs -->
+    <div class="tabs">
+      <button class="tab active" data-tab="overview">Overview</button>
+      <button class="tab" data-tab="watchlist">Watchlist</button>
+      <button class="tab" data-tab="portfolio">Portfolio</button>
+      <button class="tab" data-tab="system">System</button>
+    </div>
+
+    <!-- OVERVIEW TAB -->
+    <div class="tab-content active" id="tab-overview">
+      <div class="section">
+        <div class="section-title">Budget Allocation</div>
+        <div class="grid-2">
+          <div class="hud-card">
+            <div class="corner corner-tl"></div>
+            <div class="corner corner-tr"></div>
+            <div class="corner corner-bl"></div>
+            <div class="corner corner-br"></div>
+            <div class="card-label" id="budget-label"></div>
+            <div class="donut-container">
+              <div class="donut-chart" id="donut"></div>
+              <div class="donut-legend" id="donut-legend"></div>
+            </div>
+          </div>
+          <div class="hud-card">
+            <div class="corner corner-tl"></div>
+            <div class="corner corner-tr"></div>
+            <div class="corner corner-bl"></div>
+            <div class="corner corner-br"></div>
+            <div class="card-label">Investment Split</div>
+            <div id="inv-details"></div>
+            <div class="split-bar" id="split-bar"></div>
+            <div class="split-labels" id="split-labels"></div>
           </div>
         </div>
       </div>
-    </section>
 
-    <section>
-      <h3>Portfolio</h3>
-      <div class="card">
-        <div id="portfolio_empty" class="empty">No holdings yet. Complete broker setup to get started.</div>
-        <table id="portfolio_table" style="display:none">
-          <thead><tr><th>Ticker</th><th>Market</th><th>Shares</th><th>Buy Price</th><th>Value (AUD)</th><th>P/L</th></tr></thead>
-          <tbody id="portfolio_body"></tbody>
-        </table>
+      <div class="section">
+        <div class="section-title">FX Rates</div>
+        <div class="fx-strip" id="fx-strip"></div>
       </div>
-    </section>
 
-    <section>
-      <h3>Watchlist</h3>
-      <div class="card">
-        <table>
-          <thead><tr><th>Ticker</th><th>Market</th><th>Type</th><th>Risk</th><th>Thesis</th></tr></thead>
-          <tbody id="watchlist_body"></tbody>
-        </table>
-      </div>
-    </section>
-
-    <section>
-      <div class="grid grid-2">
-        <div class="card">
-          <h2>FX Rates</h2>
-          <div class="row"><span class="k">AUD / USD</span><span id="fx_aud_usd"></span></div>
-          <div class="row"><span class="k">AUD / VND</span><span id="fx_aud_vnd"></span></div>
-          <div class="row"><span class="k">USD / VND</span><span id="fx_usd_vnd"></span></div>
-          <div class="small" style="margin-top:8px">Updated: <span id="fx_updated"></span></div>
-        </div>
-        <div class="card">
-          <h2>Setup Checklist</h2>
-          <div class="checklist"><ul id="checklist_body"></ul></div>
+      <div class="section" id="research-section" style="display:none">
+        <div class="section-title">Latest Intelligence</div>
+        <div class="research-banner">
+          <div class="research-date" id="research-date"></div>
+          <div class="research-text" id="research-text"></div>
         </div>
       </div>
-    </section>
+    </div>
+
+    <!-- WATCHLIST TAB -->
+    <div class="tab-content" id="tab-watchlist">
+      <div class="section">
+        <div class="section-title">Tracked Assets</div>
+        <div class="hud-card" style="padding:0; overflow:hidden;">
+          <table class="hud-table">
+            <thead>
+              <tr>
+                <th>Ticker</th>
+                <th>Market</th>
+                <th>Price</th>
+                <th>Rating</th>
+                <th>Risk</th>
+                <th>Thesis</th>
+              </tr>
+            </thead>
+            <tbody id="watchlist-body"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- PORTFOLIO TAB -->
+    <div class="tab-content" id="tab-portfolio">
+      <div class="section">
+        <div class="section-title">Holdings</div>
+        <div class="hud-card" id="portfolio-card"></div>
+      </div>
+    </div>
+
+    <!-- SYSTEM TAB -->
+    <div class="tab-content" id="tab-system">
+      <div class="section">
+        <div class="section-title">Setup Checklist</div>
+        <div class="hud-card">
+          <div class="corner corner-tl"></div>
+          <div class="corner corner-tr"></div>
+          <div class="corner corner-bl"></div>
+          <div class="corner corner-br"></div>
+          <div id="checklist"></div>
+        </div>
+      </div>
+      <div class="section">
+        <div class="section-title">System Info</div>
+        <div class="hud-card">
+          <div class="corner corner-tl"></div>
+          <div class="corner corner-tr"></div>
+          <div class="corner corner-bl"></div>
+          <div class="corner corner-br"></div>
+          <div id="system-info"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="footer">M.A.R.K. v2.0 // POWERED BY CLAUDE OPUS 4.6 // ALL DATA FOR EDUCATIONAL PURPOSES ONLY</div>
   </div>
 
   <script>
     const D = window.DATA;
-    const fmt = (n, c = "AUD") => n == null ? "—" : new Intl.NumberFormat("en-AU", { style: "currency", currency: c, maximumFractionDigits: 0 }).format(n);
+    const $ = id => document.getElementById(id);
 
-    document.getElementById("name").textContent = D.profile.name;
-    document.getElementById("generated").textContent = D.generated_at;
-    document.getElementById("networth").textContent = fmt(D.net_worth_aud);
-    document.getElementById("income").textContent = fmt(D.profile.income_aud);
-    document.getElementById("payday").textContent = D.profile.pay_day + "th";
-    document.getElementById("risk").textContent = D.profile.risk;
-    document.getElementById("horizon").textContent = D.profile.horizon + " — " + D.profile.experience;
-    document.getElementById("savings").textContent = fmt(D.savings.current_aud);
-    document.getElementById("savings_target").textContent = fmt(D.savings.target_aud);
-    document.getElementById("savings_bar").style.width = D.savings.progress_percent + "%";
+    // Helpers
+    const fmtAUD = n => n == null ? '--' : '$' + n.toLocaleString('en-AU', { maximumFractionDigits: 0 });
+    const fmtNum = n => n == null ? '--' : n.toLocaleString('en-AU');
 
+    // Loading screen
+    setTimeout(() => $('loader').classList.add('hidden'), 1200);
+
+    // Timestamp
+    $('timestamp').textContent = 'DATA: ' + D.generated_at + ' // SYD ' + new Date().toLocaleTimeString('en-AU', { hour: '2-digit', minute: '2-digit', hour12: false, timeZone: 'Australia/Sydney' });
+
+    // Metrics cards
+    const metrics = [
+      { label: 'Net Worth', value: fmtAUD(D.net_worth_aud), sub: 'Savings + Investments' },
+      { label: 'Monthly Income', value: fmtAUD(D.profile.income_aud), sub: 'Pay day: ' + D.profile.pay_day + 'th' },
+      { label: 'Risk Profile', value: D.profile.risk.toUpperCase(), sub: D.profile.horizon },
+      { label: 'Emergency Fund', value: null, sub: null, custom: true }
+    ];
+
+    $('metrics-grid').innerHTML = metrics.map((m, i) => {
+      if (m.custom) {
+        const pct = D.savings.progress_percent;
+        const offset = 163 - (163 * pct / 100);
+        return `<div class="hud-card">
+          <div class="corner corner-tl"></div><div class="corner corner-tr"></div>
+          <div class="corner corner-bl"></div><div class="corner corner-br"></div>
+          <div class="card-label">Emergency Fund</div>
+          <div class="arc-container">
+            <div class="arc-gauge">
+              <svg viewBox="0 0 60 60">
+                <circle class="track" cx="30" cy="30" r="26" />
+                <circle class="fill" cx="30" cy="30" r="26" style="stroke-dashoffset:${offset}" />
+              </svg>
+              <div class="pct">${pct}%</div>
+            </div>
+            <div>
+              <div style="font-family:'Orbitron';font-size:16px;font-weight:700;color:var(--text-bright)">${fmtAUD(D.savings.current_aud)}</div>
+              <div class="metric-sub">Target: ${fmtAUD(D.savings.target_aud)}</div>
+            </div>
+          </div>
+        </div>`;
+      }
+      return `<div class="hud-card">
+        <div class="corner corner-tl"></div><div class="corner corner-tr"></div>
+        <div class="corner corner-bl"></div><div class="corner corner-br"></div>
+        <div class="card-label">${m.label}</div>
+        <div class="metric-value">${m.value}</div>
+        <div class="metric-sub">${m.sub}</div>
+      </div>`;
+    }).join('');
+
+    // Budget donut
     const cm = D.current_month;
-    document.getElementById("month_label").textContent = "Budget — " + cm.month;
-    document.getElementById("m_income").textContent = fmt(cm.income_aud);
-    document.getElementById("m_spending").textContent = fmt(cm.spending_aud);
-    document.getElementById("m_savings").textContent = fmt(cm.savings_aud);
-    document.getElementById("m_invest").textContent = fmt(cm.investments_aud);
-    document.getElementById("inv_au").textContent = fmt(cm.investment_split.AU);
-    document.getElementById("inv_vn").textContent = fmt(cm.investment_split.VN);
-    document.getElementById("inv_us").textContent = fmt(cm.investment_split.US);
+    $('budget-label').textContent = 'Budget // ' + cm.month;
 
+    const segments = [
+      { label: 'Spending', value: cm.spending_aud, color: '#ff1744' },
+      { label: 'Savings', value: cm.savings_aud, color: '#ffd600' },
+      { label: 'Investments', value: cm.investments_aud, color: '#00e676' }
+    ];
+
+    const total = segments.reduce((s, x) => s + x.value, 0);
+    const circumference = 2 * Math.PI * 42;
+    let offset = 0;
+
+    let svgSegs = '';
+    segments.forEach(s => {
+      const pct = s.value / total;
+      const dashLen = pct * circumference;
+      svgSegs += `<circle class="segment" cx="50" cy="50" r="42"
+        stroke="${s.color}" style="stroke-dasharray:${dashLen} ${circumference - dashLen};stroke-dashoffset:${-offset}"
+      />`;
+      offset += dashLen;
+    });
+
+    $('donut').innerHTML = `
+      <svg viewBox="0 0 100 100">${svgSegs}</svg>
+      <div class="donut-center">
+        <div class="amount">${fmtAUD(total)}</div>
+        <div class="label">Total</div>
+      </div>`;
+
+    $('donut-legend').innerHTML = segments.map(s =>
+      `<div class="legend-item">
+        <div class="legend-dot" style="background:${s.color}"></div>
+        <span>${s.label}</span>
+        <span class="legend-value">${fmtAUD(s.value)}</span>
+      </div>`
+    ).join('');
+
+    // Investment split
     const split = cm.investment_split;
-    const total = split.AU + split.VN + split.US;
-    const bar = document.getElementById("split_bar");
-    if (total > 0) {
-      bar.innerHTML = `
-        <div class="seg au" style="flex:${split.AU}"></div>
-        <div class="seg vn" style="flex:${split.VN}"></div>
-        <div class="seg us" style="flex:${split.US}"></div>`;
+    const invTotal = split.AU + split.VN + split.US;
+
+    $('inv-details').innerHTML = `
+      <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:8px;">
+        <div style="display:flex;justify-content:space-between;font-size:13px">
+          <span style="color:var(--muted)"><span class="dot-au" style="display:inline-block;width:8px;height:8px;border-radius:2px;background:var(--cyan);margin-right:6px;vertical-align:middle"></span>Australia</span>
+          <span style="font-family:'Share Tech Mono';color:var(--text-bright)">${fmtAUD(split.AU)}</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;font-size:13px">
+          <span style="color:var(--muted)"><span style="display:inline-block;width:8px;height:8px;border-radius:2px;background:var(--orange);margin-right:6px;vertical-align:middle"></span>Vietnam</span>
+          <span style="font-family:'Share Tech Mono';color:var(--text-bright)">${fmtAUD(split.VN)}</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;font-size:13px">
+          <span style="color:var(--muted)"><span style="display:inline-block;width:8px;height:8px;border-radius:2px;background:var(--green);margin-right:6px;vertical-align:middle"></span>United States</span>
+          <span style="font-family:'Share Tech Mono';color:var(--text-bright)">${fmtAUD(split.US)}</span>
+        </div>
+      </div>`;
+
+    if (invTotal > 0) {
+      $('split-bar').innerHTML = `
+        <div class="split-seg au" style="flex:${split.AU}"></div>
+        <div class="split-seg vn" style="flex:${split.VN}"></div>
+        <div class="split-seg us" style="flex:${split.US}"></div>`;
     }
 
-    if (D.portfolio.holdings.length > 0) {
-      document.getElementById("portfolio_empty").style.display = "none";
-      document.getElementById("portfolio_table").style.display = "table";
-      document.getElementById("portfolio_body").innerHTML = D.portfolio.holdings.map(h => `
-        <tr>
-          <td><strong>${h.ticker}</strong></td>
-          <td>${h.market}</td>
-          <td>${h.shares}</td>
-          <td>${fmt(h.buy_price, h.currency)}</td>
-          <td>${fmt(h.value_aud)}</td>
-          <td class="${h.pl_aud >= 0 ? "pos" : "neg"}">${h.pl_aud >= 0 ? "+" : ""}${fmt(h.pl_aud)}</td>
-        </tr>`).join("");
+    // FX rates
+    const fxData = [
+      { name: 'AUD/USD', rate: D.fx_rates.AUD_USD },
+      { name: 'AUD/VND', rate: D.fx_rates.AUD_VND ? fmtNum(D.fx_rates.AUD_VND) : '--' },
+      { name: 'USD/VND', rate: D.fx_rates.USD_VND ? fmtNum(D.fx_rates.USD_VND) : '--' }
+    ];
+
+    $('fx-strip').innerHTML = fxData.map(f =>
+      `<div class="fx-pair">
+        <div class="fx-name">${f.name}</div>
+        <div class="fx-rate">${f.rate}</div>
+      </div>`
+    ).join('') + `<div style="font-family:'Share Tech Mono';font-size:10px;color:var(--muted);display:flex;align-items:center;padding:0 8px;">Updated: ${D.fx_rates.last_updated || 'never'}</div>`;
+
+    // Research
+    if (D.latest_research) {
+      $('research-section').style.display = 'block';
+      $('research-date').textContent = 'REPORT // ' + D.latest_research.date;
+      $('research-text').textContent = D.latest_research.summary;
     }
 
-    document.getElementById("watchlist_body").innerHTML = D.watchlist.map(w => `
-      <tr>
-        <td><strong>${w.ticker}</strong></td>
-        <td>${w.market}</td>
-        <td>${w.type}</td>
-        <td><span class="tag risk-${w.risk.includes("low") ? "low" : w.risk.includes("high") ? "high" : "medium"}">${w.risk}</span></td>
-        <td class="small">${w.thesis}</td>
-      </tr>`).join("");
+    // Watchlist
+    $('watchlist-body').innerHTML = D.watchlist.map((w, i) => {
+      const ratingClass = w.rating.toLowerCase().includes('buy') ? 'buy' :
+                          w.rating.toLowerCase().includes('hold') ? 'hold' :
+                          w.rating.toLowerCase().includes('wait') ? 'wait' : 'sell';
+      const riskClass = w.risk.includes('low') ? 'low' : w.risk.includes('high') ? 'high' : 'medium';
+      const marketClass = w.market === 'ASX' ? 'asx' : 'hose';
 
-    document.getElementById("fx_aud_usd").textContent = D.fx_rates.AUD_USD ?? "—";
-    document.getElementById("fx_aud_vnd").textContent = D.fx_rates.AUD_VND ?? "—";
-    document.getElementById("fx_usd_vnd").textContent = D.fx_rates.USD_VND ?? "—";
-    document.getElementById("fx_updated").textContent = D.fx_rates.last_updated ?? "never";
+      return `<tr onclick="toggleDetail(${i})">
+        <td><span class="ticker">${w.ticker}</span></td>
+        <td><span class="market-tag market-${marketClass}">${w.market}</span></td>
+        <td style="font-family:'Share Tech Mono';color:var(--text-bright)">${w.price || '--'}</td>
+        <td><span class="rating-tag rating-${ratingClass}">${w.rating}</span></td>
+        <td><span class="risk-tag risk-${riskClass}">${w.risk}</span></td>
+        <td><span class="thesis-text">${w.thesis}</span></td>
+      </tr>
+      <tr class="row-detail" id="detail-${i}">
+        <td colspan="6">
+          <div class="detail-grid">
+            <div class="detail-item"><span class="detail-label">Type: </span><span class="detail-value">${w.type.toUpperCase()}</span></div>
+            <div class="detail-item"><span class="detail-label">Market: </span><span class="detail-value">${w.market}</span></div>
+            <div class="detail-item"><span class="detail-label">Rating: </span><span class="detail-value">${w.rating}</span></div>
+            <div class="detail-item"><span class="detail-label">Risk Level: </span><span class="detail-value">${w.risk}</span></div>
+          </div>
+          <div style="margin-top:8px;font-size:12px;color:var(--text);line-height:1.6;">${w.thesis}</div>
+        </td>
+      </tr>`;
+    }).join('');
 
-    document.getElementById("checklist_body").innerHTML = D.setup_checklist.map(c => `
-      <li><span class="box ${c.done ? "done" : ""}"></span><span>${c.task}</span></li>`).join("");
+    // Portfolio
+    if (D.portfolio.holdings.length === 0) {
+      $('portfolio-card').innerHTML = `
+        <div class="empty-state">
+          <div class="hex"></div>
+          <p>NO HOLDINGS DETECTED</p>
+          <p style="margin-top:6px;color:var(--cyan);font-size:11px">Complete broker setup to begin acquisition</p>
+        </div>`;
+    } else {
+      $('portfolio-card').innerHTML = `<table class="hud-table">
+        <thead><tr><th>Ticker</th><th>Market</th><th>Shares</th><th>Buy Price</th><th>Value (AUD)</th><th>P/L</th></tr></thead>
+        <tbody>${D.portfolio.holdings.map(h => `
+          <tr>
+            <td><span class="ticker">${h.ticker}</span></td>
+            <td>${h.market}</td>
+            <td>${h.shares}</td>
+            <td>${h.buy_price}</td>
+            <td>${fmtAUD(h.value_aud)}</td>
+            <td style="color:${h.pl_aud >= 0 ? 'var(--green)' : 'var(--red)'}">${h.pl_aud >= 0 ? '+' : ''}${fmtAUD(h.pl_aud)}</td>
+          </tr>`).join('')}</tbody></table>`;
+    }
+
+    // Checklist
+    $('checklist').innerHTML = D.setup_checklist.map(c =>
+      `<div class="check-item">
+        <div class="check-box ${c.done ? 'done' : ''}"></div>
+        <span class="check-text ${c.done ? 'done' : ''}">${c.task}</span>
+      </div>`
+    ).join('');
+
+    // System info
+    $('system-info').innerHTML = `
+      <div class="check-item"><span class="detail-label" style="color:var(--muted);width:140px;display:inline-block">Operator</span><span style="font-family:'Share Tech Mono';color:var(--text-bright)">${D.profile.name}</span></div>
+      <div class="check-item"><span class="detail-label" style="color:var(--muted);width:140px;display:inline-block">Base Currency</span><span style="font-family:'Share Tech Mono';color:var(--text-bright)">${D.profile.base_currency}</span></div>
+      <div class="check-item"><span class="detail-label" style="color:var(--muted);width:140px;display:inline-block">Experience</span><span style="font-family:'Share Tech Mono';color:var(--text-bright)">${D.profile.experience}</span></div>
+      <div class="check-item"><span class="detail-label" style="color:var(--muted);width:140px;display:inline-block">Data Source</span><span style="font-family:'Share Tech Mono';color:var(--text-bright)">Claude Opus 4.6 // Daily 0800 AEST</span></div>
+      <div class="check-item"><span class="detail-label" style="color:var(--muted);width:140px;display:inline-block">Last Update</span><span style="font-family:'Share Tech Mono';color:var(--text-bright)">${D.generated_at}</span></div>
+      <div class="check-item"><span class="detail-label" style="color:var(--muted);width:140px;display:inline-block">Markets</span><span style="font-family:'Share Tech Mono';color:var(--text-bright)">ASX // HOSE // S&P 500</span></div>
+    `;
+
+    // Tab switching
+    document.querySelectorAll('.tab').forEach(tab => {
+      tab.addEventListener('click', () => {
+        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+        document.getElementById('tab-' + tab.dataset.tab).classList.add('active');
+      });
+    });
+
+    // Expandable watchlist rows
+    function toggleDetail(i) {
+      const row = document.getElementById('detail-' + i);
+      row.classList.toggle('active');
+    }
+
+    // Auto-refresh timestamp every minute
+    setInterval(() => {
+      const now = new Date();
+      $('timestamp').textContent = 'DATA: ' + D.generated_at + ' // SYD ' + now.toLocaleTimeString('en-AU', { hour: '2-digit', minute: '2-digit', hour12: false, timeZone: 'Australia/Sydney' });
+    }, 60000);
   </script>
 </body>
 </html>
