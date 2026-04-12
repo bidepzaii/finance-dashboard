@@ -1,0 +1,246 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Minh — Financial Dashboard</title>
+  <script src="data.js"></script>
+  <style>
+    :root {
+      --bg: #0b0f14;
+      --card: #131a24;
+      --card-2: #1a2230;
+      --text: #e7eef7;
+      --muted: #8a98ac;
+      --accent: #6aa9ff;
+      --green: #3ecf8e;
+      --red: #ff6b6b;
+      --border: #222c3b;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Inter", system-ui, sans-serif;
+      font-size: 14px;
+      line-height: 1.55;
+    }
+    .container { max-width: 1200px; margin: 0 auto; padding: 32px 24px 80px; }
+    header { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 28px; border-bottom: 1px solid var(--border); padding-bottom: 20px; }
+    header h1 { font-size: 22px; margin: 0; letter-spacing: -0.01em; }
+    header .sub { color: var(--muted); font-size: 12px; margin-top: 4px; }
+    .generated { color: var(--muted); font-size: 11px; }
+    .grid { display: grid; gap: 16px; }
+    .grid-4 { grid-template-columns: repeat(4, 1fr); }
+    .grid-2 { grid-template-columns: 1.4fr 1fr; }
+    .grid-3 { grid-template-columns: repeat(3, 1fr); }
+    @media (max-width: 900px) {
+      .grid-4 { grid-template-columns: repeat(2, 1fr); }
+      .grid-2, .grid-3 { grid-template-columns: 1fr; }
+    }
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 18px 20px;
+    }
+    .card h2 { font-size: 12px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); margin: 0 0 10px; font-weight: 500; }
+    .big { font-size: 26px; font-weight: 600; letter-spacing: -0.02em; }
+    .small { color: var(--muted); font-size: 12px; }
+    .row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid var(--border); }
+    .row:last-child { border-bottom: none; }
+    .row .k { color: var(--muted); }
+    table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    th { text-align: left; color: var(--muted); font-weight: 500; font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; padding: 10px 8px; border-bottom: 1px solid var(--border); }
+    td { padding: 10px 8px; border-bottom: 1px solid var(--border); }
+    tr:last-child td { border-bottom: none; }
+    .tag { display: inline-block; padding: 2px 8px; border-radius: 6px; font-size: 11px; background: var(--card-2); color: var(--muted); }
+    .tag.risk-low { background: rgba(62,207,142,0.12); color: var(--green); }
+    .tag.risk-medium { background: rgba(255,180,60,0.12); color: #ffb43c; }
+    .tag.risk-high { background: rgba(255,107,107,0.12); color: var(--red); }
+    .bar { background: var(--card-2); border-radius: 6px; height: 8px; overflow: hidden; margin-top: 8px; }
+    .bar-fill { background: linear-gradient(90deg, var(--accent), #9ec7ff); height: 100%; }
+    .checklist li { list-style: none; padding: 6px 0; display: flex; align-items: center; gap: 10px; }
+    .checklist ul { padding: 0; margin: 0; }
+    .box { width: 14px; height: 14px; border: 1px solid var(--border); border-radius: 4px; flex-shrink: 0; }
+    .box.done { background: var(--green); border-color: var(--green); }
+    .empty { color: var(--muted); font-style: italic; padding: 20px 0; text-align: center; }
+    .split { display: flex; gap: 6px; margin-top: 10px; }
+    .split .seg { height: 8px; border-radius: 4px; }
+    .seg.au { background: var(--accent); }
+    .seg.vn { background: #f58a42; }
+    .seg.us { background: var(--green); }
+    .legend { display: flex; gap: 14px; margin-top: 8px; font-size: 11px; color: var(--muted); }
+    .dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 5px; vertical-align: middle; }
+    .dot.au { background: var(--accent); }
+    .dot.vn { background: #f58a42; }
+    .dot.us { background: var(--green); }
+    section { margin-top: 24px; }
+    section h3 { font-size: 14px; margin: 0 0 12px; font-weight: 600; color: var(--text); }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div>
+        <h1>Financial Dashboard</h1>
+        <div class="sub">Personal advisor for <strong id="name"></strong> — AU / VN / US markets</div>
+      </div>
+      <div class="generated">Last updated: <span id="generated"></span></div>
+    </header>
+
+    <div class="grid grid-4">
+      <div class="card">
+        <h2>Net Worth</h2>
+        <div class="big" id="networth"></div>
+        <div class="small">Savings + investments</div>
+      </div>
+      <div class="card">
+        <h2>Monthly Income</h2>
+        <div class="big" id="income"></div>
+        <div class="small">Paid <span id="payday"></span> of each month</div>
+      </div>
+      <div class="card">
+        <h2>Risk Profile</h2>
+        <div class="big" id="risk"></div>
+        <div class="small" id="horizon"></div>
+      </div>
+      <div class="card">
+        <h2>Emergency Fund</h2>
+        <div class="big"><span id="savings"></span> / <span id="savings_target"></span></div>
+        <div class="bar"><div class="bar-fill" id="savings_bar"></div></div>
+      </div>
+    </div>
+
+    <section>
+      <h3>This Month's Plan</h3>
+      <div class="grid grid-2">
+        <div class="card">
+          <h2 id="month_label"></h2>
+          <div class="row"><span class="k">Income</span><span id="m_income"></span></div>
+          <div class="row"><span class="k">Spending (rent + living)</span><span id="m_spending"></span></div>
+          <div class="row"><span class="k">Savings (emergency fund)</span><span id="m_savings"></span></div>
+          <div class="row"><span class="k">Investments</span><span id="m_invest"></span></div>
+        </div>
+        <div class="card">
+          <h2>Investment Split</h2>
+          <div class="row"><span class="k"><span class="dot au"></span>Australia</span><span id="inv_au"></span></div>
+          <div class="row"><span class="k"><span class="dot vn"></span>Vietnam</span><span id="inv_vn"></span></div>
+          <div class="row"><span class="k"><span class="dot us"></span>United States</span><span id="inv_us"></span></div>
+          <div class="split" id="split_bar"></div>
+          <div class="legend">
+            <span><span class="dot au"></span>AU</span>
+            <span><span class="dot vn"></span>VN</span>
+            <span><span class="dot us"></span>US</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <h3>Portfolio</h3>
+      <div class="card">
+        <div id="portfolio_empty" class="empty">No holdings yet. Complete broker setup to get started.</div>
+        <table id="portfolio_table" style="display:none">
+          <thead><tr><th>Ticker</th><th>Market</th><th>Shares</th><th>Buy Price</th><th>Value (AUD)</th><th>P/L</th></tr></thead>
+          <tbody id="portfolio_body"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <section>
+      <h3>Watchlist</h3>
+      <div class="card">
+        <table>
+          <thead><tr><th>Ticker</th><th>Market</th><th>Type</th><th>Risk</th><th>Thesis</th></tr></thead>
+          <tbody id="watchlist_body"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <section>
+      <div class="grid grid-2">
+        <div class="card">
+          <h2>FX Rates</h2>
+          <div class="row"><span class="k">AUD / USD</span><span id="fx_aud_usd"></span></div>
+          <div class="row"><span class="k">AUD / VND</span><span id="fx_aud_vnd"></span></div>
+          <div class="row"><span class="k">USD / VND</span><span id="fx_usd_vnd"></span></div>
+          <div class="small" style="margin-top:8px">Updated: <span id="fx_updated"></span></div>
+        </div>
+        <div class="card">
+          <h2>Setup Checklist</h2>
+          <div class="checklist"><ul id="checklist_body"></ul></div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <script>
+    const D = window.DATA;
+    const fmt = (n, c = "AUD") => n == null ? "—" : new Intl.NumberFormat("en-AU", { style: "currency", currency: c, maximumFractionDigits: 0 }).format(n);
+
+    document.getElementById("name").textContent = D.profile.name;
+    document.getElementById("generated").textContent = D.generated_at;
+    document.getElementById("networth").textContent = fmt(D.net_worth_aud);
+    document.getElementById("income").textContent = fmt(D.profile.income_aud);
+    document.getElementById("payday").textContent = D.profile.pay_day + "th";
+    document.getElementById("risk").textContent = D.profile.risk;
+    document.getElementById("horizon").textContent = D.profile.horizon + " — " + D.profile.experience;
+    document.getElementById("savings").textContent = fmt(D.savings.current_aud);
+    document.getElementById("savings_target").textContent = fmt(D.savings.target_aud);
+    document.getElementById("savings_bar").style.width = D.savings.progress_percent + "%";
+
+    const cm = D.current_month;
+    document.getElementById("month_label").textContent = "Budget — " + cm.month;
+    document.getElementById("m_income").textContent = fmt(cm.income_aud);
+    document.getElementById("m_spending").textContent = fmt(cm.spending_aud);
+    document.getElementById("m_savings").textContent = fmt(cm.savings_aud);
+    document.getElementById("m_invest").textContent = fmt(cm.investments_aud);
+    document.getElementById("inv_au").textContent = fmt(cm.investment_split.AU);
+    document.getElementById("inv_vn").textContent = fmt(cm.investment_split.VN);
+    document.getElementById("inv_us").textContent = fmt(cm.investment_split.US);
+
+    const split = cm.investment_split;
+    const total = split.AU + split.VN + split.US;
+    const bar = document.getElementById("split_bar");
+    if (total > 0) {
+      bar.innerHTML = `
+        <div class="seg au" style="flex:${split.AU}"></div>
+        <div class="seg vn" style="flex:${split.VN}"></div>
+        <div class="seg us" style="flex:${split.US}"></div>`;
+    }
+
+    if (D.portfolio.holdings.length > 0) {
+      document.getElementById("portfolio_empty").style.display = "none";
+      document.getElementById("portfolio_table").style.display = "table";
+      document.getElementById("portfolio_body").innerHTML = D.portfolio.holdings.map(h => `
+        <tr>
+          <td><strong>${h.ticker}</strong></td>
+          <td>${h.market}</td>
+          <td>${h.shares}</td>
+          <td>${fmt(h.buy_price, h.currency)}</td>
+          <td>${fmt(h.value_aud)}</td>
+          <td class="${h.pl_aud >= 0 ? "pos" : "neg"}">${h.pl_aud >= 0 ? "+" : ""}${fmt(h.pl_aud)}</td>
+        </tr>`).join("");
+    }
+
+    document.getElementById("watchlist_body").innerHTML = D.watchlist.map(w => `
+      <tr>
+        <td><strong>${w.ticker}</strong></td>
+        <td>${w.market}</td>
+        <td>${w.type}</td>
+        <td><span class="tag risk-${w.risk.includes("low") ? "low" : w.risk.includes("high") ? "high" : "medium"}">${w.risk}</span></td>
+        <td class="small">${w.thesis}</td>
+      </tr>`).join("");
+
+    document.getElementById("fx_aud_usd").textContent = D.fx_rates.AUD_USD ?? "—";
+    document.getElementById("fx_aud_vnd").textContent = D.fx_rates.AUD_VND ?? "—";
+    document.getElementById("fx_usd_vnd").textContent = D.fx_rates.USD_VND ?? "—";
+    document.getElementById("fx_updated").textContent = D.fx_rates.last_updated ?? "never";
+
+    document.getElementById("checklist_body").innerHTML = D.setup_checklist.map(c => `
+      <li><span class="box ${c.done ? "done" : ""}"></span><span>${c.task}</span></li>`).join("");
+  </script>
+</body>
+</html>
