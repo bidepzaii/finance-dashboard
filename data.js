@@ -21,22 +21,23 @@ window.DATA = {
     month: "2026-04",
     income_aud: 4900,
     spending_aud: 3200,
-    savings_aud: 1200,
-    investments_aud: 500,
-    investment_split: { AU: 500, VN: 0, US: 0 },
-    status: "Payday today — $500 to AU (Pearler) if Compliance approved; else carry to May"
+    savings_aud: 1700,
+    investments_aud: 0,
+    investment_split: { AU: 0, VN: 0, US: 0 },
+    status: "DEFERRED — Macquarie Compliance approval pending. April = zero trades. Plan $500 buys for May 15 if Compliance clears."
   },
   portfolio: {
     total_invested_aud: 0,
     holdings: []
   },
   watchlist: [
-    { ticker: "VAS", market: "ASX", type: "ETF", risk: "low", price: "$110.85", rating: "BUY", thesis: "Core AU ETF — broad ASX 300 exposure, 3.08% yield, 68% franked, -2.9% from 52w high" },
-    { ticker: "IVV", market: "ASX", type: "ETF", risk: "low/med", price: "$65.10", rating: "BUY (small)", thesis: "S&P 500 via ASX — S&P near 7,000, -7.1% from 52w high, fwd P/E ~21.5x" },
-    { ticker: "VGS", market: "ASX", type: "ETF", risk: "low/med", price: "$146.80", rating: "HOLD", thesis: "Global ex-AU — 60% overlap with IVV. Add when budget grows past $1k/month" },
-    { ticker: "CSL", market: "ASX", type: "stock", risk: "medium", price: "$140.58", rating: "WATCH", thesis: "Blue chip biotech, -50% below consensus target, BUT H1 2026 NPAT -81% YoY. Wait for stabilisation" },
-    { ticker: "FPT", market: "HOSE", type: "stock", risk: "medium", price: "95,400 VND", rating: "WATCH", thesis: "VN tech leader, rallied 17% in a week, P/E ~19x. VN market overheated at index level" },
-    { ticker: "VNM", market: "HOSE", type: "stock", risk: "low/med", price: "62,800 VND", rating: "WAIT", thesis: "Vinamilk — 8% yield, 130% payout ratio unsustainable. Wait for 24 Apr earnings" }
+    { ticker: "VAS", market: "ASX", type: "ETF", risk: "low", price: "$110.85", rating: "BUY", thesis: "Core AU ETF — broad ASX 300, 3.08% yield, partially franked, first May 15 buy candidate" },
+    { ticker: "IVV", market: "ASX", type: "ETF", risk: "low/med", price: "$65.10", rating: "BUY (small) / HOLD", thesis: "S&P 500 via ASX — underlying P/E ~21.5x, S&P near 7,000. Target ~$60 for lump-sum; drip-feed OK" },
+    { ticker: "VGS", market: "ASX", type: "ETF", risk: "low/med", price: "$146.80", rating: "HOLD", thesis: "Global ex-AU — overlaps IVV ~60-70%. Add when budget grows past $1k/month" },
+    { ticker: "CSL", market: "ASX", type: "stock", risk: "medium", price: "$140.58", rating: "WATCH", thesis: "Biotech blue chip, ~50% below consensus target, BUT H1 2026 NPAT -81% YoY. Do NOT catch the knife" },
+    { ticker: "FPT", market: "HOSE", type: "stock", risk: "medium", price: "95,400 VND", rating: "OVERHEATED — WATCH", thesis: "+28% in ~10 days on FTSE EM upgrade. Wait for pullback to 82-88k VND band" },
+    { ticker: "VNM", market: "HOSE", type: "stock", risk: "low/med", price: "62,800 VND", rating: "WAIT", thesis: "8% yield, 130% payout ratio unsustainable. Wait for 24 Apr earnings" },
+    { ticker: "VCB", market: "HOSE", type: "stock", risk: "medium", price: "70,000 VND", rating: "NEW WATCH", thesis: "Top FTSE EM upgrade beneficiary. Best-in-class VN bank. Target entry ~62k VND" }
   ],
   fx_rates: {
     AUD_USD: 0.7137,
@@ -45,18 +46,19 @@ window.DATA = {
     last_updated: "2026-04-15"
   },
   market_flags: [
-    { market: "VN-Index", status: "overheated", note: "+44% YoY with foreign outflows. Drip-feed VN exposure once TCBS is live." }
+    { market: "VN-Index", status: "overheated_but_structurally_bullish", note: "FTSE EM upgrade effective 21 Sep 2026 (~US$6bn passive inflows expected). Near-term overheated, long-term positive. Drip-feed." }
   ],
   setup_checklist: [
     { task: "Sign up for AU broker (Pearler recommended)", done: false },
     { task: "Sign up for VN broker (TCBS recommended)", done: false },
     { task: "Configure 8 AM Sydney daily research cron", done: true },
+    { task: "Macquarie Compliance approval for personal trading", done: false },
     { task: "First investment executed", done: false },
     { task: "Emergency fund at $9,600 AUD", done: false }
   ],
   latest_research: {
     date: "2026-04-15",
     file: "research/2026-04-15.md",
-    summary: "Payday. $500 allocated AU-only (70% VAS / 30% IVV) pending Compliance approval. VN market flagged overheated (+44% YoY, foreign outflows). CSL added to watchlist with caution after -81% H1 NPAT drop. AUD strengthened to 0.7137 against USD (+3.6%)."
+    summary: "Payday, but April is still DEFERRED pending Macquarie Compliance. Plan for May: ~70% VAS / 30% IVV from the $500 budget. VN-Index rally driven by FTSE EM upgrade (Sep 21 effective) — overheated near-term, structurally bullish. CSL added to watchlist with caution after -81% H1 NPAT drop. AUD strengthened to 0.7137 (+3.6%)."
   }
 };
